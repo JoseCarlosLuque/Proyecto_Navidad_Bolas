@@ -1,0 +1,5 @@
+Estoy tratando de añadir un feature para implementar un módulo de radiofrecuencia
+para tener control remoto del dispositivo. 
+
+Por otro lado, creo el código del emisor (mando) que es otra placa arduino con la antena y los 
+botones de "START" y "STOP" .

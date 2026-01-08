@@ -1,6 +1,15 @@
+#include <SPI.h>
+#include <nRF24L01.h>
+#include <RF24.h>
+
 // Pines driver BTS7960
 const int RPWM = 9;   // PWM derecha
 const int LPWM = 10;  // PWM izquierda
+
+// Pines modulo radio frecuencia; 
+RF24 radio(8, 5);
+const byte direccion[6] = "DISCO";
+bool motorEnMarcha = true; // Por seguridad, arrancan apagados
 
 // Final de carrera superior
 const int PIN_TOP = 4;
@@ -26,11 +35,38 @@ void setup() {
   pinMode(PIN_SUBIR, INPUT_PULLUP); // pulsado -> LOW
   pinMode(PIN_BAJAR, INPUT_PULLUP); // pulsado -> LOW
 
+  radio.begin(); // Iniciazmos la radio
+  radio.openReadingPipe(1, direccion); // Establecemos el canal
+  radio.setPALevel(RF24_PA_MAX); // Potencia de la señal
+  radio.setDataRate(RF24_250KBPS); // Velocidad 
+  radio.setChannel(115); // Canal
+  radio.startListening();
+
   stopMotor();
-}
+} 
 
 void loop() {
 
+  if (radio.available()) {
+    byte comandoRecibido;
+    radio.read(&comandoRecibido, sizeof(comandoRecibido));
+    
+    if (comandoRecibido == 0xA1) motorEnMarcha = true;
+    if (comandoRecibido == 0xB2) motorEnMarcha = false;
+  }
+
+  // Leemos el estado en cada vuelta, y paramos o efectuamos un ciclo de movimiento.
+  if (motorEnMarcha) {
+    ejecutarCicloMovimiento();
+  } else {
+    stopMotor();
+  }
+}
+
+
+// ================== FUNCIONES ==================
+
+void ejecutarCicloMovimiento() {
   // ----------- DETECCIÓN DE BOTONES MANUALES ----------------
   if (digitalRead(PIN_SUBIR) == LOW || digitalRead(PIN_BAJAR) == LOW) {
     modoServicio = true;
@@ -57,11 +93,7 @@ void loop() {
   delay(t_pausa);
 
   if (digitalRead(PIN_SUBIR) == LOW || digitalRead(PIN_BAJAR) == LOW) { modoServicio = true; return; }
-
 }
-
-
-// ================== FUNCIONES ==================
 
 void controlManual() {
   stopMotor();
@@ -101,6 +133,8 @@ void controlManual() {
     delay(20);
   }
 }
+
+
 
 void subirHastaFinal() {
   unsigned long maxTime = 120000;
