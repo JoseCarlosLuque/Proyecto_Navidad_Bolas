@@ -14,7 +14,7 @@ void setup() {
 
   radio.begin();
   radio.openWritingPipe(direccion);
-  radio.setPALevel(RF24_PA_MAX);    // Potencia máxima para el mando
+  radio.setPALevel(RF24_PA_LOW);    // Potencia máxima para el mando
   radio.setDataRate(RF24_250KBPS); // Misma velocidad que el receptor
   radio.setChannel(115);           // Mismo canal que el receptor
   radio.stopListening();           // Modo emisor
@@ -36,6 +36,6 @@ void enviarComando(byte comando) {
   // Enviamos el comando 15 veces muy rápido. 
   // Esto garantiza que si un paquete se pierde por el ruido, el siguiente llegue.
   for(int i = 0; i < 15; i++) {
-    radio.write(&comando, sizeof(comando));
+    radio.write(&comando, sizeof(comando), true); // El 'true' activa multicast (no espera ACK)
   }
 }
