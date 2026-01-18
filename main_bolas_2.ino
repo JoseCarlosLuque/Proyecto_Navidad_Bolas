@@ -15,7 +15,7 @@ const byte direccion[6] = "DISCO";
 const int PIN_TOP = 4;  
 
 // Botones de servicio
-const int PIN_SUBIR = 6;   
+const int PIN_SUBIR = 6;
 const int PIN_BAJAR = 7;
 
 // Parámetros del movimiento automático
@@ -42,9 +42,9 @@ void setup() {
 
   radio.begin(); // Iniciazmos la radio
   radio.openReadingPipe(1, direccion); // Establecemos el canal
-  radio.setPALevel(RF24_PA_LOW); // Potencia de la señal
+  radio.setPALevel(RF24_PA_LOW); // Potencia de la señal        ========>>>  TO DO: !! CAMBIAR A HIGH CUANDO SALGA PRODUCCION!!
   radio.setDataRate(RF24_250KBPS); // Velocidad 
-  radio.setChannel(115); // Canal
+  radio.setChannel(115); // Canal establecido 
   radio.startListening();
 
   stopMotor();
