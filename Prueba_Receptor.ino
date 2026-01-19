@@ -9,24 +9,26 @@ const int pinCSN = 10;
 RF24 radio(pinCE, pinCSN);
 
 // Single radio pipe address for the 2 nodes to communicate.
-const uint64_t pipe = 0xE8E8F0F0E1LL;
+const byte pipe[6] = "DISCO";
 
 char data[16];
 
 void setup(void)
 {
   Serial.begin(9600);
+  printf_begin();
+  delay(500);
   if(!radio.begin()){
     Serial.println("Algo ha fallado con la antena");
   }else{
     Serial.println("Todo va bien con la antena");
   }
+  radio.stopListening();      // Paramos antes de configurar
   radio.setAutoAck(false); // Eliminamos el ACK para poder estableer la comunicación.
   radio.setPALevel(RF24_PA_MIN); // Se establece la potencia
   radio.setDataRate(RF24_250KBPS); // Se establece la velocidad
-  radio.openReadingPipe(1,pipe);
+  radio.openReadingPipe(1, pipe);
   radio.startListening();
-  printf_begin();
   radio.printDetails();
 }
  
